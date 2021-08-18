@@ -1,13 +1,22 @@
 import React from 'react'
 import axios from 'axios'
+import styled from 'styled-components'
+
+const ButtonLoading = styled.button`
+:hover {
+    cursor: wait;
+}
+`
 
 class Login extends React.Component {
     state = {
         credentials: {
-            username: '',
-            password: ''
-        }
+            username: 'lambda',
+            password: 'school',
+        },
+        isLoading: false
     }
+
 
     handleChange = e => {
         this.setState({
@@ -20,16 +29,20 @@ class Login extends React.Component {
 
     login = e => {
         e.preventDefault();
-
+        this.setState({
+            isLoading: true
+        })
         axios.post('http://localhost:5000/api/login', this.state.credentials)
             .then(res => {
-                localStorage.setItem('token', res.data.token);
-                localStorage.setItem('role', res.data.role);
-                localStorage.setItem('username', res.data.username);
+                console.log(">>>>>>", res.data)
+                localStorage.setItem('token', res.data.payload);
                 this.props.history.push('/protected');
             })
             .catch(err => {
                 console.log(err);
+                // this.setState({
+                //     isLoading: false
+                // })
             })
     }
 
@@ -49,7 +62,8 @@ class Login extends React.Component {
                         value={this.state.credentials.password}
                         onChange={this.handleChange}
                     />
-                    <button>Log in</button>
+                    {this.isLoading ? <ButtonLoading>Loading</ButtonLoading> : <button>Log in</button>}
+                    
                 </form>
             </div>
         )
